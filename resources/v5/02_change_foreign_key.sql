@@ -1,0 +1,1 @@
+ALTER TABLE bookings DROP FOREIGN KEY bookings_ibfk_3, ADD CONSTRAINT FOREIGN KEY (user_id) REFERENCES cab_users(id);
