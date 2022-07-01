@@ -1,0 +1,1 @@
+ALTER TABLE cabs MODIFY COLUMN vehicle_number varchar(10);
