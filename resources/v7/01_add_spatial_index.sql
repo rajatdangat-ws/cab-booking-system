@@ -1,0 +1,1 @@
+CREATE SPATIAL INDEX current_location ON cabs(current_location);
