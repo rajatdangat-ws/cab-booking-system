@@ -2,8 +2,8 @@ import Hapi from '@hapi/hapi';
 import path from 'path';
 import wurst from 'wurst';
 import { camelCase, snakeCase } from 'lodash';
-import authBearer from 'hapi-auth-bearer-token';
-import authConfig from 'config/auth';
+// import authBearer from 'hapi-auth-bearer-token';
+// import authConfig from 'config/auth';
 import mapKeysDeep from 'map-keys-deep';
 import hapiPagination from 'hapi-pagination';
 import hapiSwaggerUI from 'hapi-swaggerui';
@@ -35,6 +35,10 @@ const prepDatabase = async () => {
 
 export let server;
 
+const validate = async function (decoded, request, h) {
+    return { isValid: true };
+};
+
 const initServer = async () => {
     server = Hapi.server(serverConfig);
 
@@ -57,33 +61,37 @@ const initServer = async () => {
             options: {
                 grouping: 'tags',
                 tags: [
+                    // {
+                    //     name: 'health-check',
+                    //     description: 'Health check endpoint'
+                    // },
+                    // {
+                    //     name: 'users',
+                    //     description: 'User related endpoints'
+                    // },
+                    // {
+                    //     name: 'oauth2-resources',
+                    //     description: 'Oauth2 resources related endpoints'
+                    // },
+                    // {
+                    //     name: 'oauth2-scopes',
+                    //     description: 'Oauth2 scopes related endpoints'
+                    // },
+                    // {
+                    //     name: 'oauth2-clients',
+                    //     description: 'Oauth2 clients related endpoints'
+                    // },
+                    // {
+                    //     name: 'oauth2-tokens',
+                    //     description: 'Oauth2 tokens related endpoints'
+                    // },
+                    // {
+                    //     name: 'reset-cache',
+                    //     description: 'Cache invalidation endpoints'
+                    // },
                     {
-                        name: 'health-check',
-                        description: 'Health check endpoint'
-                    },
-                    {
-                        name: 'users',
+                        name: 'cab-users',
                         description: 'User related endpoints'
-                    },
-                    {
-                        name: 'oauth2-resources',
-                        description: 'Oauth2 resources related endpoints'
-                    },
-                    {
-                        name: 'oauth2-scopes',
-                        description: 'Oauth2 scopes related endpoints'
-                    },
-                    {
-                        name: 'oauth2-clients',
-                        description: 'Oauth2 clients related endpoints'
-                    },
-                    {
-                        name: 'oauth2-tokens',
-                        description: 'Oauth2 tokens related endpoints'
-                    },
-                    {
-                        name: 'reset-cache',
-                        description: 'Cache invalidation endpoints'
                     }
                 ]
             }
@@ -101,11 +109,19 @@ const initServer = async () => {
     });
 
     // register auth plugin
-    await server.register({
-        plugin: authBearer
+    // await server.register({
+    //     plugin: authBearer
+    // });
+    // server.auth.strategy('bearer', 'bearer-access-token', authConfig);
+    // server.auth.default('bearer');
+
+    //register jwt plugin
+    await server.register(require('hapi-auth-jwt2'));
+    server.auth.strategy('jwt', 'jwt', {
+        key: 'secretKey',
+        validate
     });
-    server.auth.strategy('bearer', 'bearer-access-token', authConfig);
-    server.auth.default('bearer');
+    server.auth.default('jwt');
 
     // Register Wurst plugin
     await server.register({
